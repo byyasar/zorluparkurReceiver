@@ -30,10 +30,11 @@ struct Data_Package
 };
 
 Data_Package data; // Create a variable with the above structure
+
 void HiziAyarla(byte pwmHizSol, byte pwmHizSag)
 {
-  analogWrite(Enable_A, pwmHizSag);
-  analogWrite(Enable_B, pwmHizSol);
+  analogWrite(Enable_A, map(pwmHizSag, 0, 255, 65, 255));
+  analogWrite(Enable_B, map(pwmHizSol, 0, 255, 65, 255));
 }
 
 void Duraklat()
@@ -47,24 +48,42 @@ void Duraklat()
   digitalWrite(LeftMotorF, LOW);
 }
 
-void IleriGit(int hizSol, int hizSag)
+void IleriGit()
 {
-  HiziAyarla(hizSol, hizSag);
   digitalWrite(RightMotorB, LOW);
   digitalWrite(LeftMotorB, LOW);
   digitalWrite(RightMotorF, HIGH);
   digitalWrite(LeftMotorF, HIGH);
-  Serial.println("Motor forward");
+  Serial.println("Ileri");
 }
-void GeriGit(int hizSol, int hizSag)
+void GeriGit()
 {
-  HiziAyarla(hizSol, hizSag);
   digitalWrite(RightMotorB, HIGH);
   digitalWrite(LeftMotorB, HIGH);
   digitalWrite(RightMotorF, LOW);
   digitalWrite(LeftMotorF, LOW);
-  Serial.println("Motor Back");
+  Serial.println("Geri");
 }
+
+void SagaHizliDon()
+{
+  digitalWrite(RightMotorB, HIGH);
+  digitalWrite(LeftMotorB, LOW);
+  digitalWrite(RightMotorF, LOW);
+  digitalWrite(LeftMotorF, HIGH);
+  Serial.println("hizli saga don");
+}
+void SolaHizliDon()
+{
+  digitalWrite(RightMotorB, LOW);
+  digitalWrite(LeftMotorB, HIGH);
+  digitalWrite(RightMotorF, HIGH);
+  digitalWrite(LeftMotorF, LOW);
+  Serial.println("hizli sola don");
+}
+
+/*
+
 void SagaHizliDon(int hizSol, int hizSag)
 {
   HiziAyarla(hizSol, hizSag);
@@ -86,11 +105,7 @@ void SolaHizliDon(int hizSol, int hizSag)
 void SagaDon(int hizSol, int hizSag)
 {
   HiziAyarla(hizSol, hizSag);
-  /*digitalWrite(RightMotorB, LOW);
-  digitalWrite(LeftMotorB, LOW);
-  digitalWrite(RightMotorF, LOW);
-  digitalWrite(LeftMotorF, HIGH);*/
-  digitalWrite(RightMotorB, LOW);
+   digitalWrite(RightMotorB, LOW);
   digitalWrite(LeftMotorB, LOW);
   digitalWrite(RightMotorF, HIGH);
   digitalWrite(LeftMotorF, HIGH);
@@ -99,17 +114,14 @@ void SagaDon(int hizSol, int hizSag)
 void SolaDon(int hizSol, int hizSag)
 {
   HiziAyarla(hizSol, hizSag);
-  /*digitalWrite(RightMotorB, LOW);
-  digitalWrite(LeftMotorB, LOW);
-  digitalWrite(RightMotorF, HIGH);
-  digitalWrite(LeftMotorF, LOW);*/
+
   digitalWrite(RightMotorB, LOW);
   digitalWrite(LeftMotorB, LOW);
   digitalWrite(RightMotorF, HIGH);
   digitalWrite(LeftMotorF, HIGH);
   Serial.println("yavas sola don");
 }
-
+*/
 void setup()
 {
   pinMode(RightMotorF, OUTPUT);
@@ -150,21 +162,42 @@ void loop()
     Serial.print(data.pot);
     Serial.print("-");
     Serial.println(data.anahtar);
-    if (data.solsag < 118)
+    if (data.solsag < 100 && data.ilerigeri > 150)
+    {
+      HiziAyarla(100, 10);
+      IleriGit();
+    }
+    else if (data.solsag > 150 && data.ilerigeri > 150)
+    {
+      HiziAyarla(10, 100);
+      IleriGit();
+    }
+    else if (data.solsag < 100 && data.ilerigeri < 150 && data.ilerigeri > 100)
+    { // tam sola
+      HiziAyarla(100, 100);
+      SolaHizliDon();
+    }
+    else if (data.solsag > 150 && data.ilerigeri < 150 && data.ilerigeri > 100)
+    { // tam saga
+      HiziAyarla(100, 100);
+      SagaHizliDon();
+    }
+    else if (data.ilerigeri > 150)
     {
 
-      data.ilerigeri > 140 ? SolaDon((data.solsag), (127 - data.solsag) * 2) : data.ilerigeri < 110 ? SagaDon((255 - data.solsag), (127 - data.solsag) * 2)
-                                                                                                    : SolaHizliDon(data.hiz, data.hiz);
+      HiziAyarla(data.hiz, data.hiz);
+      IleriGit();
     }
-    else if (data.solsag > 128)
+    else if (data.ilerigeri<100)
     {
-      data.ilerigeri > 140 ? SagaDon((data.solsag), (127 - data.solsag) * 2) : data.ilerigeri < 110 ? SolaDon((127 - data.solsag) * 2, (255 - data.solsag))
-                                                                                                    : SagaHizliDon(data.hiz, data.hiz);
+      HiziAyarla(data.hiz, data.hiz);
+      GeriGit();
     }
+    
+    
     else
     {
-      data.ilerigeri > 140 ? IleriGit(data.hiz, data.hiz) : data.ilerigeri < 110 ? GeriGit(data.hiz, data.hiz)
-                                                                                 : Duraklat();
+      Duraklat();
     }
   }
 
