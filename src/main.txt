@@ -82,46 +82,7 @@ void SolaHizliDon()
   Serial.println("hizli sola don");
 }
 
-/*
 
-void SagaHizliDon(int hizSol, int hizSag)
-{
-  HiziAyarla(hizSol, hizSag);
-  digitalWrite(RightMotorB, HIGH);
-  digitalWrite(LeftMotorB, LOW);
-  digitalWrite(RightMotorF, LOW);
-  digitalWrite(LeftMotorF, HIGH);
-  Serial.println("hizli saga don");
-}
-void SolaHizliDon(int hizSol, int hizSag)
-{
-  HiziAyarla(hizSol, hizSag);
-  digitalWrite(RightMotorB, LOW);
-  digitalWrite(LeftMotorB, HIGH);
-  digitalWrite(RightMotorF, HIGH);
-  digitalWrite(LeftMotorF, LOW);
-  Serial.println("hizli sola don");
-}
-void SagaDon(int hizSol, int hizSag)
-{
-  HiziAyarla(hizSol, hizSag);
-   digitalWrite(RightMotorB, LOW);
-  digitalWrite(LeftMotorB, LOW);
-  digitalWrite(RightMotorF, HIGH);
-  digitalWrite(LeftMotorF, HIGH);
-  Serial.println("yavas saga don");
-}
-void SolaDon(int hizSol, int hizSag)
-{
-  HiziAyarla(hizSol, hizSag);
-
-  digitalWrite(RightMotorB, LOW);
-  digitalWrite(LeftMotorB, LOW);
-  digitalWrite(RightMotorF, HIGH);
-  digitalWrite(LeftMotorF, HIGH);
-  Serial.println("yavas sola don");
-}
-*/
 void setup()
 {
   pinMode(RightMotorF, OUTPUT);
@@ -164,12 +125,12 @@ void loop()
     Serial.println(data.anahtar);
     if (data.solsag < 100 && data.ilerigeri > 150)
     {
-      HiziAyarla(100, 10);
+      HiziAyarla(data.hiz, 10);
       IleriGit();
     }
     else if (data.solsag > 150 && data.ilerigeri > 150)
     {
-      HiziAyarla(10, 100);
+      HiziAyarla(10, data.hiz);
       IleriGit();
     }
     else if (data.solsag < 100 && data.ilerigeri < 150 && data.ilerigeri > 100)
